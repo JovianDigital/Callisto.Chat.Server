@@ -13,9 +13,7 @@ describe('AdministrationModelList', () => {
 	const loadMock = (stubs?: Record<string, unknown>) => {
 		return proxyquire.noCallThru().load<typeof AdministrationModelListModule>('./AdministrationModelList', {
 			'../../../app/ui-utils/client': {},
-			'meteor/kadira:flow-router': {
-				FlowRouter: {},
-			},
+			'../../lib/router': {},
 			'../../views/hooks/useUpgradeTabParams': {
 				useUpgradeTabParams: () => ({
 					isLoading: false,
@@ -96,10 +94,8 @@ describe('AdministrationModelList', () => {
 			const router = spy();
 			const handleDismiss = spy();
 			const AdministrationModelList = loadMock({
-				'meteor/kadira:flow-router': {
-					FlowRouter: {
-						go: router,
-					},
+				'../../lib/router': {
+					navigate: router,
 				},
 			});
 

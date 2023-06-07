@@ -1,12 +1,12 @@
 import { OptionTitle } from '@rocket.chat/fuselage';
 import { useTranslation, useRoute, useMethod, useSetModal, useRole } from '@rocket.chat/ui-contexts';
 import { useQuery } from '@tanstack/react-query';
-import { FlowRouter } from 'meteor/kadira:flow-router';
 import type { FC } from 'react';
 import React from 'react';
 
 import type { AccountBoxItem } from '../../../app/ui-utils/client/lib/AccountBox';
 import { getUpgradeTabLabel, isFullyFeature } from '../../../lib/upgradeTab';
+import { navigate } from '../../lib/router';
 import RegisterWorkspaceModal from '../../views/admin/cloud/modals/RegisterWorkspaceModal';
 import { useUpgradeTabParams } from '../../views/hooks/useUpgradeTabParams';
 import Emoji from '../Emoji';
@@ -90,7 +90,7 @@ const AdministrationModelList: FC<AdministrationModelListProps> = ({ accountBoxI
 						{accountBoxItems.map((item, key) => {
 							const action = () => {
 								if (item.href) {
-									FlowRouter.go(item.href);
+									navigate(item.href);
 								}
 								onDismiss();
 							};
