@@ -54,13 +54,16 @@ describe('AdministrationModelList', () => {
 	});
 
 	context('when clicked', () => {
+		const navigate = spy();
 		const pushRoute = spy();
 		const handleDismiss = spy();
 
 		const ProvidersMock = ({ children }: { children: ReactNode }) => {
 			return (
 				<ModalContextMock>
-					<RouterContextMock pushRoute={pushRoute}>{children}</RouterContextMock>
+					<RouterContextMock navigate={navigate} pushRoute={pushRoute}>
+						{children}
+					</RouterContextMock>
 				</ModalContextMock>
 			);
 		};
@@ -73,7 +76,7 @@ describe('AdministrationModelList', () => {
 			const button = screen.getByText('Workspace');
 
 			userEvent.click(button);
-			await waitFor(() => expect(pushRoute).to.have.been.called.with('admin-index'));
+			await waitFor(() => expect(navigate).to.have.been.called.with('/admin'));
 			await waitFor(() => expect(handleDismiss).to.have.been.called());
 		});
 
@@ -91,17 +94,12 @@ describe('AdministrationModelList', () => {
 		});
 
 		it('should render admin box and call router', async () => {
-			const router = spy();
 			const handleDismiss = spy();
-			const AdministrationModelList = loadMock({
-				'../../lib/router': {
-					navigate: router,
-				},
-			});
+			const AdministrationModelList = loadMock();
 
 			render(
 				<AdministrationModelList
-					accountBoxItems={[{ name: 'Admin Item', href: 'admin-item' } as any]}
+					accountBoxItems={[{ name: 'Admin Item', href: '/admin/item' } as any]}
 					showWorkspace={false}
 					onDismiss={handleDismiss}
 				/>,
@@ -112,7 +110,7 @@ describe('AdministrationModelList', () => {
 
 			userEvent.click(button);
 
-			await waitFor(() => expect(router).to.have.been.called.with('admin-item'));
+			await waitFor(() => expect(navigate).to.have.been.called.with('/admin/item'));
 			await waitFor(() => expect(handleDismiss).to.have.been.called());
 		});
 

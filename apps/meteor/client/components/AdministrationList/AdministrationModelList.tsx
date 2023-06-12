@@ -1,12 +1,11 @@
 import { OptionTitle } from '@rocket.chat/fuselage';
-import { useTranslation, useRoute, useMethod, useSetModal, useRole } from '@rocket.chat/ui-contexts';
+import { useTranslation, useRoute, useMethod, useSetModal, useRole, useNavigate } from '@rocket.chat/ui-contexts';
 import { useQuery } from '@tanstack/react-query';
 import type { FC } from 'react';
 import React from 'react';
 
 import type { AccountBoxItem } from '../../../app/ui-utils/client/lib/AccountBox';
 import { getUpgradeTabLabel, isFullyFeature } from '../../../lib/upgradeTab';
-import { navigate } from '../../lib/router';
 import RegisterWorkspaceModal from '../../views/admin/cloud/modals/RegisterWorkspaceModal';
 import { useUpgradeTabParams } from '../../views/hooks/useUpgradeTabParams';
 import Emoji from '../Emoji';
@@ -35,7 +34,7 @@ const AdministrationModelList: FC<AdministrationModelListProps> = ({ accountBoxI
 		setModal(<RegisterWorkspaceModal onClose={handleModalClose} />);
 	};
 
-	const adminRoute = useRoute('admin-index');
+	const navigate = useNavigate();
 	const upgradeRoute = useRoute('upgrade');
 	const cloudRoute = useRoute('cloud');
 	const showUpgradeItem = !isLoading && tabType;
@@ -80,7 +79,7 @@ const AdministrationModelList: FC<AdministrationModelListProps> = ({ accountBoxI
 						role='listitem'
 						text={t('Workspace')}
 						onClick={() => {
-							adminRoute.push({ context: '/' });
+							navigate('/admin');
 							onDismiss();
 						}}
 					/>
