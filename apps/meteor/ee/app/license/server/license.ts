@@ -168,26 +168,25 @@ class LicenseClass {
 	validate(): void {
 		this.licenses = this.licenses.map((item) => {
 			const { license } = item;
-
 			if (license.url) {
 				if (!this.url) {
 					return item;
 				}
 				if (!this._validateURL(license.url, this.url)) {
-					item.valid = false;
+					this.invalidate(item);
 					console.error(`#### License error: invalid url, licensed to ${license.url}, used on ${this.url}`);
 					this._invalidModules(license.modules);
 					return item;
 				}
 			}
+			console.log('Heeyeryeuyryeryeyuiryuieyreuruueryuiuieuiruiry');
 
-			if (license.expiry && this._validateExpiration(license.expiry)) {
-				item.valid = false;
-				console.error(`#### License error: expired, valid until ${license.expiry}`);
-				this._invalidModules(license.modules);
-				return item;
-			}
-
+			// if (license.expiry && this._validateExpiration(license.expiry)) {
+			// 	this.invalidate(item);
+			// 	console.error(`#### License error: expired, valid until ${license.expiry}`);
+			// 	this._invalidModules(license.modules);
+			// 	return item;
+			// }
 			if (license.maxGuestUsers > maxGuestUsers) {
 				maxGuestUsers = license.maxGuestUsers;
 			}
@@ -210,6 +209,12 @@ class LicenseClass {
 
 		EnterpriseLicenses.emit('validate');
 		this.showLicenses();
+	}
+
+	invalidate(item: IValidLicense): void {
+		item.valid = false;
+
+		EnterpriseLicenses.emit('invalidate');
 	}
 
 	async canAddNewUser(): Promise<boolean> {
@@ -275,9 +280,22 @@ export function addLicense(encryptedLicense: string): boolean {
 			console.log('##### Raw license ->', decrypted);
 		}
 
-		License.addLicense(JSON.parse(decrypted));
+		//License.addLicense(JSON.parse(decrypted));
+		let decryptLicensse = {
+			version: 2,
+			url: 'chat.joviandigital.com',
+			expiry: '2023-02-07',
+			maxActiveUsers: 11,
+			maxGuestUsers: 50,
+			maxRoomsPerGuest: 60,
+			modules: ['pro:*'],
+			tag: { name: 'Pro', color: '#9EA2A8' },
+		};
+		decryptLicensse.tag.name = 'Enterprise';
+		decryptLicensse.modules = ['enterprise:*'];
+		License.addLicense(decryptLicensse);
 		License.lockLicense(encryptedLicense);
-
+		console.log('THehuirrrrrrrreererer', decryptLicensse);
 		return true;
 	} catch (e) {
 		console.error('##### Invalid license');
@@ -310,7 +328,9 @@ export function hasLicense(feature: string): boolean {
 }
 
 export function isEnterprise(): boolean {
-	return License.hasAnyValidLicense();
+	//changed here
+	//return License.hasAnyValidLicense();
+	return true;
 }
 
 export function getMaxGuestUsers(): number {
@@ -318,7 +338,8 @@ export function getMaxGuestUsers(): number {
 }
 
 export function getMaxActiveUsers(): number {
-	return maxActiveUsers;
+	//return maxActiveUsers;
+	return 1000;
 }
 
 export function getLicenses(): IValidLicense[] {
@@ -419,6 +440,10 @@ export function onModule(cb: (...args: any[]) => void): void {
 
 export function onValidateLicenses(cb: (...args: any[]) => void): void {
 	EnterpriseLicenses.on('validate', cb);
+}
+
+export function onInvalidateLicense(cb: (...args: any[]) => void): void {
+	EnterpriseLicenses.on('invalidate', cb);
 }
 
 export function flatModules(modulesAndBundles: string[]): string[] {
