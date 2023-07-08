@@ -120,9 +120,11 @@ export function initWatchers(watcher: DatabaseWatcher, broadcast: BroadcastCallb
 				}
 
 				// Override data cuz we do not publish all fields
-				const subscription = await Subscriptions.findOneById<Pick<ISubscription, keyof typeof subscriptionFields>>(id, {
-					projection: subscriptionFields,
-				});
+				const subscription =
+					data ||
+					(await Subscriptions.findOneById<Pick<ISubscription, keyof typeof subscriptionFields>>(id, {
+						projection: subscriptionFields,
+					}));
 				if (!subscription) {
 					return;
 				}
@@ -301,6 +303,11 @@ export function initWatchers(watcher: DatabaseWatcher, broadcast: BroadcastCallb
 	});
 
 	watcher.on<IInstanceStatus>(InstanceStatus.getCollectionName(), ({ clientAction, id, data, diff }) => {
+		if (clientAction === 'removed') {
+			void broadcast('watch.instanceStatus', { clientAction, id, data: { _id: id } });
+			return;
+		}
+
 		void broadcast('watch.instanceStatus', { clientAction, data, diff, id });
 	});
 
